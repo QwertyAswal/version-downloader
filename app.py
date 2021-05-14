@@ -1,18 +1,28 @@
 import requests
 import os
-import shutil
 
 end_line = '\n'+'*' * os.get_terminal_size().columns+'\n'
 wait_line = 'Please wait while program is loading..........\n'
 
-print('\nThe following program downloads the last added binary file from a private git repo.')
+print('\nThe following program downloads the last added binary file from a git repo.')
 print(end_line)
 
 try:
+    choice = int(
+        input('Input 1 for public repository and 2 for private repository: '))
+    print(end_line)
+    if choice != 1 and choice != 2:
+        raise Exception()
+except Exception:
+    print('Enter Valid Choice\n')
+    exit()
+try:
+
     repository_name = input('Enter repository name: ')
     username = input('Enter user name of the repository: ')
-    access_token = 'token ' + \
-        input('Enter personal access token of the repository: ')
+    if choice == 2:
+        access_token = 'token ' + \
+            input('Enter personal access token of the repository: ')
 
     print(end_line)
     print(wait_line)
@@ -21,9 +31,11 @@ try:
         username, repository_name)
 
     headers_release = {
-        'Accept': 'application/json',
-        'Authorization': access_token
+        'Accept': 'application/json'
     }
+
+    if choice == 2:
+        headers_release['Authorization'] = access_token
 
     data = requests.get(url=url_releases, headers=headers_release).json()
 
@@ -57,9 +69,12 @@ try:
             print(name+'- ', end='')
 
             headers = {
-                'Authorization': access_token,
                 'Accept': 'application/octet-stream'
             }
+
+            if choice == 2:
+                headers['Authorization'] = access_token
+
             try:
                 if not os.path.exists(dir_name+'/'+name):
                     r = requests.get(url, headers=headers)
